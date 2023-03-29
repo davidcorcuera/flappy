@@ -16,6 +16,12 @@
 -- virtual resolution handling library
 push = require 'push'
 
+-- classic OOP class library
+Class = require 'class'
+
+-- bird class we've written
+require 'Bird'
+
 -- physical screen dimensions
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 576
@@ -35,6 +41,9 @@ local BACKGROUND_SCROLL_SPEED = 30
 local GROUND_SCROLL_SPEED = 60
 
 local BACKGROUND_LOOPING_POINT = 413
+
+-- our bird sprite
+local bird = Bird()
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -65,7 +74,13 @@ end
 
 function love.draw()
     push:start()
+    
     love.graphics.draw(background, -backgroundScroll, 0)
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
+
+    -- render our bird to the screen using its own render logic
+    bird:render()
+
+
     push:finish()
 end
