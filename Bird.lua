@@ -1,7 +1,7 @@
 Bird = Class {}
 
-local GRAVITY = 20
-local JUMP_FORCE = -5
+local GRAVITY = 10
+local JUMP_FORCE = -2
 
 function Bird:init()
     self.image = love.graphics.newImage('bird.png')
@@ -37,7 +37,7 @@ function Bird:update(dt)
     -- apply gravity to velocity
     self.dy = self.dy + GRAVITY * dt
 
-    if love.keyboard.wasPressed('space') then
+    if love.keyboard.wasPressed('space') or love.mouse.wasPressed(1) then
         self.dy = JUMP_FORCE
         sounds['jump']:play()
     end
