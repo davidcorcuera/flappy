@@ -33,7 +33,26 @@ function PlayState:init()
     self.lastY = -PIPE_HEIGHT + math.random(80) + 20
 end
 
+function PlayState:enter(enterParams)
+    
+    if enterParams then
+        self.bird = enterParams.bird
+        self.pipePairs = enterParams.pipePairs
+        self.timer = enterParams.timer
+        self.spawnInterval = enterParams.spawnInterval
+        self.score = enterParams.score
+        self.lastY = enterParams.lastY    
+    end
+end
+
 function PlayState:update(dt)
+
+    -- go into pause state if 'p' is pressed
+    if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
+        gameStatus = self
+        gStateMachine:change('pause')
+    end
+
     -- update timer for pipe spawning
     self.timer = self.timer + dt
 

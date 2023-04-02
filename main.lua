@@ -35,6 +35,7 @@ require 'states/PlayState'
 require 'states/TitleScreenState'
 require 'states/ScoreState'
 require 'states/CountdownState'
+require 'states/PauseState'
 
 -- physical screen dimensions
 WINDOW_WIDTH = 1024
@@ -56,17 +57,8 @@ local GROUND_SCROLL_SPEED = 60
 
 local BACKGROUND_LOOPING_POINT = 413
 
--- our bird sprite
-local bird = Bird()
-
-local pipePairs = {}
-
-local spawnTimer = 0
-
-local lastY = -PIPE_HEIGHT + math.random(80) + 20
-
--- scrolling variable to pause the game when we collide with a pipe
-local scrolling = true
+-- scrolling variable to pause the game when hit 'p'
+scrolling = true
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -87,7 +79,10 @@ function love.load()
         ['hurt'] = love.audio.newSource('hurt.wav', 'static'),
         ['score'] = love.audio.newSource('score.wav', 'static'),
         -- https://freesound.org/people/xsgianni/sounds/388079/
-        ['music'] = love.audio.newSource('marios_way.mp3', 'static')
+        ['music'] = love.audio.newSource('marios_way.mp3', 'static'),
+        -- "https://pixabay.com/
+        ['pause'] = love.audio.newSource('pause.mp3', 'static')
+        
     }
 
     -- kick off music
@@ -107,7 +102,8 @@ function love.load()
         ['title'] = function() return TitleScreenState() end,
         ['play'] = function() return PlayState() end,
         ['score'] = function() return ScoreState() end,
-        ['countdown'] = function() return CountdownState() end
+        ['countdown'] = function() return CountdownState() end,
+        ['pause'] = function() return PauseState() end,
     }
     gStateMachine:change('title')
 
@@ -115,7 +111,6 @@ function love.load()
 
     -- initialize mouse input table
     love.mouse.buttonsPressed = {}
-
 end
 
 function love.resize(w, h)
@@ -154,9 +149,10 @@ function love.mouse.wasPressed(button)
 end
 
 function love.update(dt)
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+    if scrolling then
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+    end
 
     -- now, we just update the state machine, which defers to the right state
     gStateMachine:update(dt)
@@ -168,11 +164,11 @@ end
 function love.draw()
     push:start()
 
+
     love.graphics.draw(background, -backgroundScroll, 0)
-
     gStateMachine:render()
-
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
+
 
     push:finish()
 end
